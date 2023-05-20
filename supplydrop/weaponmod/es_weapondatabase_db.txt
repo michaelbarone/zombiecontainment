@@ -1,0 +1,133 @@
+"weapondatabase"
+{
+"weapon_galil"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+"weapon_ak47"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+"weapon_scout"
+{
+"rof"	 "1"
+"recoil2"	 "1"
+}
+"weapon_sg552"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+"weapon_awp"
+{
+"rof"	 "1"
+"recoil2"	 "1"
+}
+"weapon_g3sg1"
+{
+"rof"	 "1"
+"recoil2"	 "1"
+}
+ 	"weapon_famas"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+ 	"weapon_m4a1"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+ 	"weapon_aug"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+ 	"weapon_sg550"
+{
+"rof"	 "1"
+"recoil2"	 "1"
+}
+ 	"weapon_glock"
+{
+"rof"	 ".9"
+"recoil2"	 ".7"
+"automatic" "1"
+}
+ 	"weapon_usp"
+{
+"rof"	 ".9"
+"recoil2"	 ".7"
+"automatic"	 "1"
+}
+ 	"weapon_p228"
+{
+"rof"	 ".9"
+"recoil2"	 ".7"
+"automatic"	 "1"
+}
+ 	"weapon_deagle"
+{
+"rof"	 ".9"
+"recoil2"	 ".7"
+"automatic"	 "1"
+}
+ 	"weapon_elite"
+{
+"rof"	 ".9"
+"recoil2"	 ".7"
+"automatic"	 "1"
+}
+ 	"weapon_fiveseven"
+{
+"rof"	 ".9"
+"recoil2"	 ".7"
+"automatic"	 "1"
+}
+ 	"weapon_m3"
+{
+"rof"	 "1"
+"recoil2"	 "1"
+}
+ 	"weapon_xm1014"
+{
+"rof"	 "1"
+"recoil2"	 "1"
+}
+ 	"weapon_mac10"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+ 	"weapon_tmp"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+ 	"weapon_mp5navy"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+ 	"weapon_ump45"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+ 	"weapon_p90"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+ 	"weapon_m249"
+{
+"rof"	 "1"
+"recoil1"	 "1"
+}
+ 	"weapon_knife"
+{
+"rof"	 "1"
+}
+}

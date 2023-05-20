@@ -1,0 +1,181 @@
+block load
+{
+	es_tell event_var(userid) #multi #green [weaponmod]#lightgreen press alternate attack to switch fire modes on this pistol
+  	es_doblock corelib/noisy_on
+	est_regeventblock weapon_fire "es_doblock weaponmod/prefire"
+	es_keygroupdelete weapondatabase
+	es_keygroupload weapondatabase |weaponmod
+	est_enable_peruserkeyhook 1
+	est_enable_peruserkeyevents 1
+	est_enable_est_player_weapon_switch 1
+}
+
+block unload
+{
+	es_doblock corelib/noisy_off
+	est_unregeventblock weapon_fire "es_doblock weaponmod/prefire"
+	es_keygroupdelete weapondatabase
+	est_unhookkey -1 attack2
+}
+
+block prefire
+{
+	es_set wm_userid 0
+	es_set wm_weapon 0
+	es_set wm_weaponindex 0	
+	es_set wm_previoustime 0
+	es_set wm_currenttime 0
+	es_set wm_preammo 0
+	es_set wm_preangle 0
+	es_set wm_prepitch 0
+	es_set wm_preyaw 0
+	es_set wm_preroll 0
+	est_geteventinfo wm_userid userid
+	es est_getgun wm_weapon server_var(wm_userid)
+	es est_getweaponindex wm_weaponindex server_var(wm_userid) server_var(wm_weapon)
+	es_getindexprop wm_previoustime server_var(wm_weaponindex) "CBaseCombatWeapon.LocalActiveWeaponData.m_flNextPrimaryAttack"
+	est_curtime wm_currenttime
+	if (server_var(wm_previoustime) < server_var(wm_currenttime)) then es_set wm_previoustime server_var(wm_currenttime)
+	es est_getclipammo wm_preammo server_var(wm_userid) server_var(wm_weapon)
+	es_getplayerprop wm_preangle server_var(wm_userid) "CCSPlayer.baseclass.localdata.m_Local.m_vecPunchAngle"
+	es_splitvectorstring wm_prepitch wm_preyaw wm_preroll server_var(wm_preangle)
+}
+
+event weapon_fire
+{
+	es_set wm_postammo 0
+	es est_getclipammo wm_postammo event_var(userid) server_var(wm_weapon)
+	es_set wm_keyexist 0
+	es_exists wm_keyexist key weapondatabase server_var(wm_weapon)
+	ifx true(wm_keyexist) do
+	{
+		es_set wm_rof_multiplier 0
+		es_keygetvalue wm_rof_multiplier weapondatabase server_var(wm_weapon) rof
+		if (server_var(wm_rof_multiplier) != 1) do
+		{
+			es_set wm_nexttime 0
+			es_getindexprop wm_nexttime server_var(wm_weaponindex) "CBaseCombatWeapon.LocalActiveWeaponData.m_flNextPrimaryAttack"
+			es_math wm_nexttime - server_var(wm_previoustime)
+			es_math wm_nexttime * server_var(wm_rof_multiplier)
+			es_math wm_nexttime + server_var(wm_previoustime)
+			es_setindexprop server_var(wm_weaponindex) "CBaseCombatWeapon.LocalActiveWeaponData.m_flNextPrimaryAttack" server_var(wm_nexttime)
+		}
+		es_set wm_keyexist 0
+		es_exists wm_keyexist keyvalue weapondatabase server_var(wm_weapon) automatic
+		ifx true(wm_keyexist) do
+		{
+			es_set wm_isauto 0
+			es_keygetvalue wm_isauto weapondatabase server_var(wm_weapon) automatic
+			ifx true (wm_isauto) do
+			{
+				es_set wm_firemode 0
+				es playervar get wm_firemode event_var(userid) wm_firemode
+				if (server_var(wm_firemode) == 1) then es_setplayerprop event_var(userid) "CCSPlayer.cslocaldata.m_iShotsFired" 0
+			}
+		}
+		if (server_var(wm_preammo) != server_var(wm_postammo)) do
+		{
+			es_set wm_keyexist 0
+			es_exists wm_keyexist keyvalue weapondatabase server_var(wm_weapon) recoil1
+			ifx true(wm_keyexist) do
+			{
+				es_set wm_recoil_multiplier 0
+				es_keygetvalue wm_recoil_multiplier weapondatabase server_var(wm_weapon) recoil1
+				if (server_var(wm_recoil_multiplier) != 1) do
+				{
+					es_set wm_postangle 0
+					es_set wm_postpitch 0
+					es_set wm_postyaw 0
+					es_set wm_postroll 0
+					if (server_var(wm_recoil_multiplier) == 0) then es_setplayerprop event_var(userid) "CCSPlayer.cslocaldata.m_iShotsFired" 0
+					es_getplayerprop wm_postangle event_var(userid) "CCSPlayer.baseclass.localdata.m_Local.m_vecPunchAngle"
+					es_splitvectorstring wm_postpitch wm_postyaw wm_postroll server_var(wm_postangle)
+					es_math wm_postpitch * server_var(wm_recoil_multiplier)
+					es_createvectorstring wm_postangle server_var(wm_postpitch) server_var(wm_postyaw) server_var(wm_postroll)
+					es_setplayerprop event_var(userid) "CCSPlayer.baseclass.localdata.m_Local.m_vecPunchAngle" server_var(wm_postangle)
+				}
+			}
+			es_set wm_keyexist 0
+			es_exists wm_keyexist keyvalue weapondatabase server_var(wm_weapon) recoil2
+			ifx true(wm_keyexist) do
+			{
+				es_set wm_recoil_multiplier 0
+				es_keygetvalue wm_recoil_multiplier weapondatabase server_var(wm_weapon) recoil2
+				if (server_var(wm_recoil_multiplier) != 1) do
+				{
+					es_set wm_postangle 0
+					es_set wm_postpitch 0
+					es_set wm_postyaw 0
+					es_set wm_postroll 0
+					es_getplayerprop wm_postangle event_var(userid) "CCSPlayer.baseclass.localdata.m_Local.m_vecPunchAngle"
+					es_splitvectorstring wm_postpitch wm_postyaw wm_postroll server_var(wm_postangle)
+					es_math wm_postpitch - server_var(wm_prepitch)
+					es_math wm_postpitch * server_var(wm_recoil_multiplier)
+					es_math wm_postpitch + server_var(wm_prepitch)
+					es_createvectorstring wm_postangle server_var(wm_postpitch) server_var(wm_postyaw) server_var(wm_postroll)
+					es_setplayerprop event_var(userid) "CCSPlayer.baseclass.localdata.m_Local.m_vecPunchAngle" server_var(wm_postangle)
+				}
+			}
+		}
+	}
+}
+
+event player_spawn
+{
+	es playervar set event_var(userid) wm_firemode 0
+}
+
+event est_player_weapon_switch
+{
+	es_set wm_checkgun 0
+	es_format wm_checkgun "weapon_%1" event_var(new)
+	es_set wm_keyexist 0
+	es_exists wm_keyexist keyvalue weapondatabase server_var(wm_checkgun) automatic
+	ifx true(wm_keyexist) do
+	{
+		es_set wm_isauto 0
+		es_keygetvalue wm_isauto weapondatabase server_var(wm_checkgun) automatic
+		ifx true (wm_isauto) do
+		{
+			es est_hookkey event_var(userid) attack2
+		}
+	}
+	else do
+	{
+		es est_unhookkey event_var(userid) attack2
+	}
+}
+
+event est_client_keypress
+{
+	es_set wm_checkgun 0
+	es est_getgun wm_checkgun event_var(userid)
+	es_set wm_keyexist 0
+	es_exists wm_keyexist keyvalue weapondatabase server_var(wm_checkgun) automatic
+	ifx true(wm_keyexist) do
+	{
+		es_set wm_isauto 0
+		es_keygetvalue wm_isauto weapondatabase server_var(wm_checkgun) automatic
+		ifx true (wm_isauto) do
+		{
+			if (event_var(keyname) == "attack2") do
+			{
+				if (event_var(status) == 1) do
+				{
+					es_set wm_firemode 0
+					es playervar get wm_firemode event_var(userid) wm_firemode
+					ifx true(wm_firemode) do
+					{
+						es playervar set event_var(userid) wm_firemode 0
+						es est_csay event_var(userid) switched to normal mode
+					}
+					else do
+					{
+						es playervar set event_var(userid) wm_firemode 1
+						es est_csay event_var(userid) switched to automatic mode
+					}
+				}
+			}
+		}
+	}
+}

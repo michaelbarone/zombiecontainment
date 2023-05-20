@@ -1,0 +1,3834 @@
+// ##############################################
+// maplevels
+//      for Counter-Strike: Source
+//
+//	
+//
+// * Description:
+//      http://forums.eventscripts.com/viewtopic.php?t=33469
+// 
+//
+// * Install instructions:
+//      1. Install Mattie's EventScripts 
+//          
+//
+//      2. Copy all of this script code into a new textfile:
+//          /addons/eventscripts/zombiecontainment/maplevels/es_maplevels.txt
+//
+//	3. Edit the top part of block load with your vote and map names
+//
+//	4. add these to your script that keeps levels:
+//         es_xdoblock zombiecontainment/maplevels/levelpick1       this should be in round_end or when the next vote should be called in story mode
+//	   es_xdoblock zombiecontainment/maplevels/levelpickfinale  this is the same as levelpick, but only for finale map change
+//	   es_xdoblock zombiecontainment/maplevels/levelfun1popup   this calls the fun map vote, can be called anytime
+//	   es_xdoblock zombiecontainment/maplevels/reset            resets back to pick1, call this when you reset your levels in the other script
+//
+//	5. edit level keeping script so that it only resets the level after 'winning' (where zombiecontainment/maplevels/reset should be called), not on map_start or map_change
+//	   
+//
+//      6. Add the following line somewhere in autoexec.cfg and restart your server
+//          es_load maplevels
+//
+//
+//
+// * Credits:
+//      Written By: el_cabong
+//	help from: 101Satoon101 and the ES wiki
+//
+// * Requirements:
+//      EventScripts v2 or higher
+//      
+//      
+//           Version 1.8
+// ##############################################
+
+block load
+{
+//title of the first level chooser
+	es_xset levelpickname "Where to Go"
+//names of levels
+	es_xset level1name "Residential Areas"
+	es_xset level2name "Industrial Buildings" 
+	es_xset level3name "Outlying Areas"
+	es_xset levelfinalename "Finale"
+	es_xset levelfunname "Survival Maps"
+
+
+//starting maps
+// if 0 is used, then that choice number will not show up in the vote
+	es_xset map01 cs_office
+	es_xset map02 zm_citydefence
+	es_xset map03 0
+
+
+//your maps for each level where map23 is level 2, mapchoice 3
+// if 0 is used, then that choice number will not show up in the vote
+	es_xset map11 cs_office
+	es_xset map12 de_boston
+	es_xset map13 zm_tx_highschoolbeta7
+	es_xset map14 cs_cul_de_sac_r2
+	es_xset map15 cs_uvalno_villa
+	es_xset map16 cs_cityblock
+	es_xset map17 de_troit
+	es_xset map18 cs_Rated_R
+	es_xset map19 0
+
+	es_xset map21 de_port
+	es_xset map22 de_mallcarpark
+	es_xset map23 cs_compound
+	es_xset map24 de_sidewalk
+	es_xset map25 de_mallcarpark
+	es_xset map26 ba_terrordome
+	es_xset map27 zm_ufg_industrial_v5
+	es_xset map28 de_train
+	es_xset map29 0
+
+	es_xset map31 de_dust
+	es_xset map32 de_dust2
+	es_xset map33 zm_winter_forrest_v1
+	es_xset map34 zm_desert_fortress_v2
+	es_xset map35 bhd_convoy
+	es_xset map36 dotd_crookcounty
+	es_xset map37 scm_desert_glory
+	es_xset map38 de_motel_b2
+	es_xset map39 cs_eaglerockhotel
+
+//finale maps - map1xf are chosen if level1name is picked, map2xf are chosen if level2name is picked...
+// if 0 is used, then that choice number will not show up in the vote
+
+	es_xset map11f cs_militia
+	es_xset map12f cs_cul_de_sac_r2
+	es_xset map13f cs_cityblock
+	es_xset map21f de_port
+	es_xset map22f CS_AA_Bridge_Crossing
+	es_xset map23f as_crisis
+	es_xset map31f de_dust2
+	es_xset map32f zm_westwood_final
+	es_xset map33f as_hiekka
+
+
+//list your fun maps selection
+// if 0 is used, then that choice number will not show up in the vote
+	es_xset funmap1 de_dust
+	es_xset funmap2 pet_sematary_final
+	es_xset funmap3 cs_island_b2
+	es_xset funmap4 cs_2fort
+	es_xset funmap5 de_mallcarpark
+	es_xset funmap6 zm_hospital_remix_b2
+	es_xset funmap7 apartmentcomplex
+	es_xset funmap8 zombies_bullfighting_fix_2
+	es_xset funmap9 zm_junkyard_finalb1
+
+//number of seconds the vote is active
+	es_xset delaytime 25
+
+//this say command calls the funlevels vote
+	es_xset funmapvote "!maps"
+//this say cmd calls the story mode vote
+	es_xset storyvote "!gtfo"
+
+///////////////////////////////////
+//////no editing below/////////////
+///////////////////////////////////
+	es_xmexec ../addons/eventscripts/zombiecontainment/maplevels.cfg
+
+
+	popup create levelpick
+	es popup addlinef levelpick "%1" levelpickname
+	popup addline levelpick "-----------------"
+	es popup addlinef levelpick "->1. %1" level1name
+	es popup addlinef levelpick "->2. %1" level2name
+	es popup addlinef levelpick "->3. %1" level3name
+	popup addline levelpick "-----------------"
+	popup addline levelpick "->0. Stay Here"
+	popup menuselect levelpick zombiecontainment/maplevels/choselevel
+
+	popup create level0
+	es popup addlinef level0 "Initial Level"
+	popup addline level0 "-----------------"
+	if (server_var(map01) != 0) do
+	{
+		es popup addlinef level0 "->1. %1" map01
+	}
+	if (server_var(map02) != 0) do
+	{
+		es popup addlinef level0 "->2. %1" map02
+	}
+	if (server_var(map03) != 0) do
+	{
+		es popup addlinef level0 "->3. %1" map03
+	}	popup addline level0 "-----------------"
+	popup addline level0 "->0. Stay Here"
+	popup menuselect level0 zombiecontainment/maplevels/choselevel0
+
+	popup create level1
+	es popup addlinef level1 "%1" level1name
+	popup addline level1 "-----------------"
+	if (server_var(map11) != 0) do
+	{
+		es popup addlinef level1 "->1. %1" map11
+	}
+	if (server_var(map12) != 0) do
+	{
+		es popup addlinef level1 "->2. %1" map12
+	}
+	if (server_var(map13) != 0) do
+	{
+		es popup addlinef level1 "->3. %1" map13
+	}
+	if (server_var(map14) != 0) do
+	{
+		es popup addlinef level1 "->4. %1" map14
+	}
+	if (server_var(map15) != 0) do
+	{	
+		es popup addlinef level1 "->5. %1" map15
+	}
+	if (server_var(map16) != 0) do
+	{
+		es popup addlinef level1 "->6. %1" map16
+	}
+	if (server_var(map17) != 0) do
+	{
+		es popup addlinef level1 "->7. %1" map17
+	}
+	if (server_var(map18) != 0) do
+	{
+		es popup addlinef level1 "->8. %1" map18
+	}
+	if (server_var(map19) != 0) do
+	{	
+		es popup addlinef level1 "->9. %1" map19
+	}
+	popup addline level1 "-----------------"
+	popup addline level1 "->0. Extend this Map"
+	popup menuselect level1 zombiecontainment/maplevels/chosen1
+
+
+	popup create level2
+	es popup addlinef level2 "%1" level2name
+	popup addline level2 "-----------------"
+	if (server_var(map21) != 0) do
+	{
+		es popup addlinef level2 "->1. %1" map21
+	}
+	if (server_var(map22) != 0) do
+	{
+		es popup addlinef level2 "->2. %1" map22
+	}
+	if (server_var(map23) != 0) do
+	{
+		es popup addlinef level2 "->3. %1" map23
+	}
+	if (server_var(map24) != 0) do
+	{
+		es popup addlinef level2 "->4. %1" map24
+	}
+	if (server_var(map25) != 0) do
+	{	
+		es popup addlinef level2 "->5. %1" map25
+	}
+	if (server_var(map26) != 0) do
+	{
+		es popup addlinef level2 "->6. %1" map26
+	}
+	if (server_var(map27) != 0) do
+	{
+		es popup addlinef level2 "->7. %1" map27
+	}
+	if (server_var(map28) != 0) do
+	{
+		es popup addlinef level2 "->8. %1" map28
+	}
+	if (server_var(map29) != 0) do
+	{	
+		es popup addlinef level2 "->9. %1" map29
+	}
+	popup addline level2 "-----------------"
+	popup addline level2 "->0. Extend this Map"
+	popup menuselect level2 zombiecontainment/maplevels/chosen2
+
+
+	popup create level3
+	es popup addlinef level3 "%1" level3name
+	popup addline level3 "-----------------"
+	if (server_var(map31) != 0) do
+	{
+		es popup addlinef level3 "->1. %1" map31
+	}
+	if (server_var(map32) != 0) do
+	{
+		es popup addlinef level3 "->2. %1" map32
+	}
+	if (server_var(map33) != 0) do
+	{
+		es popup addlinef level3 "->3. %1" map33
+	}
+	if (server_var(map34) != 0) do
+	{
+		es popup addlinef level3 "->4. %1" map34
+	}
+	if (server_var(map35) != 0) do
+	{	
+		es popup addlinef level3 "->5. %1" map35
+	}
+	if (server_var(map36) != 0) do
+	{
+		es popup addlinef level3 "->6. %1" map36
+	}
+	if (server_var(map37) != 0) do
+	{
+		es popup addlinef level3 "->7. %1" map37
+	}
+	if (server_var(map38) != 0) do
+	{
+		es popup addlinef level3 "->8. %1" map38
+	}
+	if (server_var(map39) != 0) do
+	{	
+		es popup addlinef level3 "->9. %1" map39
+	}
+	popup addline level3 "-----------------"
+	popup addline level3 "->0. Extend this Map"
+	popup menuselect level3 zombiecontainment/maplevels/chosen3
+
+
+	popup create levelfun1
+	es popup addlinef levelfun1 "%1" levelfunname
+	popup addline levelfun1 "-----------------"
+	if (server_var(funmap1) != 0) do
+	{
+		es popup addlinef levelfun1 "->1. %1" funmap1
+	}
+	if (server_var(funmap2) != 0) do
+	{
+		es popup addlinef levelfun1 "->2. %1" funmap2
+	}
+	if (server_var(funmap3) != 0) do
+	{
+		es popup addlinef levelfun1 "->3. %1" funmap3
+	}
+	if (server_var(funmap4) != 0) do
+	{
+		es popup addlinef levelfun1 "->4. %1" funmap4
+	}
+	if (server_var(funmap5) != 0) do
+	{	
+		es popup addlinef levelfun1 "->5. %1" funmap5
+	}
+	if (server_var(funmap6) != 0) do
+	{
+		es popup addlinef levelfun1 "->6. %1" funmap6
+	}
+	if (server_var(funmap7) != 0) do
+	{
+		es popup addlinef levelfun1 "->7. %1" funmap7
+	}
+	if (server_var(funmap8) != 0) do
+	{
+		es popup addlinef levelfun1 "->8. %1" funmap8
+	}
+	if (server_var(funmap9) != 0) do
+	{	
+		es popup addlinef levelfun1 "->9. %1" funmap9
+	}
+	popup addline levelfun1 "-----------------"
+	popup addline levelfun1 "0. Stay On this Map"
+	popup menuselect levelfun1 zombiecontainment/maplevels/chosenfun1
+
+
+
+
+	es_xsetinfo level 0
+	es_xsetinfo m11 0
+	es_xsetinfo m12 0
+	es_xsetinfo m13 0
+	es_xsetinfo m14 0
+	es_xsetinfo m15 0
+	es_xsetinfo m16 0
+	es_xsetinfo m17 0
+	es_xsetinfo m18 0
+	es_xsetinfo m19 0
+	es_xsetinfo m10 0
+	es_xsetinfo m21 0
+	es_xsetinfo m22 0
+	es_xsetinfo m23 0
+	es_xsetinfo m24 0
+	es_xsetinfo m25 0
+	es_xsetinfo m26 0
+	es_xsetinfo m27 0
+	es_xsetinfo m28 0
+	es_xsetinfo m29 0
+	es_xsetinfo m20 0
+	es_xsetinfo m31 0
+	es_xsetinfo m32 0
+	es_xsetinfo m33 0
+	es_xsetinfo m34 0
+	es_xsetinfo m35 0
+	es_xsetinfo m36 0
+	es_xsetinfo m37 0
+	es_xsetinfo m38 0
+	es_xsetinfo m39 0
+	es_xsetinfo m30 0
+	es_xsetinfo m11f 0
+	es_xsetinfo m12f 0
+	es_xsetinfo m13f 0
+	es_xsetinfo m21f 0
+	es_xsetinfo m22f 0
+	es_xsetinfo m23f 0
+	es_xsetinfo m31f 0
+	es_xsetinfo m32f 0
+	es_xsetinfo m33f 0
+	es_xsetinfo m10f 0
+	es_xsetinfo f1 0
+	es_xsetinfo f2 0
+	es_xsetinfo f3 0
+	es_xsetinfo f4 0
+	es_xsetinfo f5 0
+	es_xsetinfo f6 0
+	es_xsetinfo f7 0
+	es_xsetinfo f8 0
+	es_xsetinfo f9 0
+	es_xsetinfo f10 0
+	es_xsetinfo l1 0
+	es_xsetinfo l2 0
+	es_xsetinfo l3 0
+	es_xsetinfo l10 0
+	es_xsetinfo l01 0
+	es_xsetinfo l02 0
+	es_xsetinfo l03 0
+	es_xsetinfo l010 0
+	es_xsetinfo switchgtfo 0	
+}
+
+event es_map_start
+{
+	popup close levelpick #all
+	popup close level1 #all
+	popup close level2 #all
+	popup close level3 #all
+	popup close levelfun1 #all
+	es_xsetinfo switchgtfo 0
+}
+
+block choselevel
+{
+	if (server_var(_popup_choice) == 1) do
+	{
+		es_math l1 + 1
+		es_msg server_var(level1name) has server_var(l1) votes
+	}
+	if (server_var(_popup_choice) == 2) do
+	{
+		es_math l2 + 1
+		es_msg server_var(level2name) has server_var(l2) votes
+	}
+	if (server_var(_popup_choice) == 3) do
+	{
+		es_math l3 + 1
+		es_msg server_var(level3name) has server_var(l3) votes
+	}
+	if (server_var(_popup_choice) == 10) do
+	{
+		es_math l10 + 1
+		es_msg server_var(l10) votes to extend current map
+	}
+}
+
+block calculatechoselevel1
+{
+	if (server_var(l1) > server_var(l2)) do
+	{
+		if (server_var(l1) > server_var(l3)) do
+		{
+			if (server_var(l1) > server_var(l10)) do
+			{
+				es_xsetinfo level 1
+				es_xdoblock zombiecontainment/maplevels/levelpick1
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatechoselevel2
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatechoselevel2
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatechoselevel2
+	}
+}
+
+block calculatechoselevel2
+{
+	if (server_var(l2) > server_var(l1)) do
+	{
+		if (server_var(l2) > server_var(l3)) do
+		{
+			if (server_var(l2) > server_var(l10)) do
+			{
+				es_xsetinfo level 2
+				es_xdoblock zombiecontainment/maplevels/levelpick1
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatechoselevel3
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatechoselevel3
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatechoselevel3
+	}
+}
+
+block calculatechoselevel3
+{
+	if (server_var(l3) > server_var(l2)) do
+	{
+		if (server_var(l3) > server_var(l1)) do
+		{
+			if (server_var(l3) > server_var(l10)) do
+			{
+				es_xsetinfo level 3
+				es_xdoblock zombiecontainment/maplevels/levelpick1
+			}
+			else do
+			{
+				es_msg Extending Current Map
+			}
+		}
+		else do
+		{
+			es_msg Extending Current Map
+		}
+	}
+	else do
+	{
+		es_msg Extending Current Map
+	}
+}
+
+block choselevel0
+{
+	if (server_var(_popup_choice) == 1) do
+	{
+		es_math l01 + 1
+		es_msg server_var(map01) has server_var(l01) votes
+	}
+	if (server_var(_popup_choice) == 2) do
+	{
+		es_math l02 + 1
+		es_msg server_var(map02) has server_var(l02) votes
+	}
+	if (server_var(_popup_choice) == 3) do
+	{
+		es_math l03 + 1
+		es_msg server_var(map03) has server_var(l03) votes
+	}
+	if (server_var(_popup_choice) == 10) do
+	{
+		es_math l010 + 1
+		es_msg server_var(l010) votes to extend current map
+	}
+}
+
+block calculatechoselevel01
+{
+	if (server_var(l01) > server_var(l02)) do
+	{
+		if (server_var(l01) > server_var(l03)) do
+		{
+			if (server_var(l01) > server_var(l010)) do
+			{
+				es_delayed 1 changelevel server_var(map01)
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatechoselevel02
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatechoselevel02
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatechoselevel02
+	}
+}
+
+block calculatechoselevel02
+{
+	if (server_var(l02) > server_var(l01)) do
+	{
+		if (server_var(l02) > server_var(l03)) do
+		{
+			if (server_var(l02) > server_var(l010)) do
+			{
+				es_delayed 1 changelevel server_var(map02)
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatechoselevel03
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatechoselevel03
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatechoselevel03
+	}
+}
+
+block calculatechoselevel03
+{
+	if (server_var(l03) > server_var(l02)) do
+	{
+		if (server_var(l03) > server_var(l01)) do
+		{
+			if (server_var(l03) > server_var(l010)) do
+			{
+				es_delayed 1 changelevel server_var(map03)
+			}
+			else do
+			{	
+				es_msg Extending Current Map
+			}
+		}
+		else do
+		{
+			es_msg Extending Current Map
+		}
+	}
+	else do
+	{
+		es_msg Extending Current Map
+	}
+}
+
+block chosen1
+{
+	if (server_var(_popup_choice) == 1) do
+	{
+		es_math m11 + 1
+		es_msg server_var(map11) has server_var(m11) votes
+	}
+	if (server_var(_popup_choice) == 2) do
+	{
+		es_math m12 + 1
+		es_msg server_var(map12) has server_var(m12) votes
+	}
+	if (server_var(_popup_choice) == 3) do
+	{
+		es_math m13 + 1
+		es_msg server_var(map13) has server_var(m13) votes
+	}
+	if (server_var(_popup_choice) == 4) do
+	{
+		es_math m14 + 1
+		es_msg server_var(map14) has server_var(m14) votes
+	}
+	if (server_var(_popup_choice) == 5) do
+	{
+		es_math m15 + 1
+		es_msg server_var(map15) has server_var(m15) votes
+	}
+	if (server_var(_popup_choice) == 6) do
+	{
+		es_math m16 + 1
+		es_msg server_var(map16) has server_var(m16) votes
+	}
+	if (server_var(_popup_choice) == 7) do
+	{
+		es_math m17 + 1
+		es_msg server_var(map17) has server_var(m17) votes
+	}
+	if (server_var(_popup_choice) == 8) do
+	{
+		es_math m18 + 1
+		es_msg server_var(map18) has server_var(m18) votes
+	}
+	if (server_var(_popup_choice) == 9) do
+	{
+		es_math m19 + 1
+		es_msg server_var(map14) has server_var(m19) votes
+	}
+	if (server_var(_popup_choice) == 10) do
+	{
+		es_math m10 + 1
+		es_msg server_var(m10) votes to Extend Map
+	}
+}
+
+
+block chosen2
+{
+	if (server_var(_popup_choice) == 1) do
+	{
+		es_math m21 + 1
+		es_msg server_var(map21) has server_var(m21) votes
+	}
+	if (server_var(_popup_choice) == 2) do
+	{
+		es_math m22 + 1
+		es_msg server_var(map22) has server_var(m22) votes
+	}
+	if (server_var(_popup_choice) == 3) do
+	{
+		es_math m23 + 1
+		es_msg server_var(map23) has server_var(m23) votes
+	}
+	if (server_var(_popup_choice) == 4) do
+	{
+		es_math m24 + 1
+		es_msg server_var(map24) has server_var(m24) votes
+	}
+	if (server_var(_popup_choice) == 5) do
+	{
+		es_math m25 + 1
+		es_msg server_var(map25) has server_var(m25) votes
+	}
+	if (server_var(_popup_choice) == 6) do
+	{
+		es_math m26 + 1
+		es_msg server_var(map26) has server_var(m26) votes
+	}
+	if (server_var(_popup_choice) == 7) do
+	{
+		es_math m27 + 1
+		es_msg server_var(map27) has server_var(m27) votes
+	}
+	if (server_var(_popup_choice) == 8) do
+	{
+		es_math m28 + 1
+		es_msg server_var(map28) has server_var(m28) votes
+	}
+	if (server_var(_popup_choice) == 9) do
+	{
+		es_math m29 + 1
+		es_msg server_var(map29) has server_var(m29) votes
+	}
+	if (server_var(_popup_choice) == 10) do
+	{
+		es_math m20 + 1
+		es_msg server_var(m20) votes to Extend Map
+	}
+}
+
+
+block chosen3
+{
+	if (server_var(_popup_choice) == 1) do
+	{
+		es_math m31 + 1
+		es_msg server_var(map31) has server_var(m31) votes
+	}
+	if (server_var(_popup_choice) == 2) do
+	{
+		es_math m32 + 1
+		es_msg server_var(map32) has server_var(m32) votes
+	}
+	if (server_var(_popup_choice) == 3) do
+	{
+		es_math m33 + 1
+		es_msg server_var(map33) has server_var(m33) votes
+	}
+	if (server_var(_popup_choice) == 4) do
+	{
+		es_math m34 + 1
+		es_msg server_var(map34) has server_var(m34) votes
+	}
+	if (server_var(_popup_choice) == 5) do
+	{
+		es_math m35 + 1
+		es_msg server_var(map35) has server_var(m35) votes
+	}
+	if (server_var(_popup_choice) == 6) do
+	{
+		es_math m36 + 1
+		es_msg server_var(map36) has server_var(m36) votes
+	}
+	if (server_var(_popup_choice) == 7) do
+	{
+		es_math m37 + 1
+		es_msg server_var(map37) has server_var(m37) votes
+	}
+	if (server_var(_popup_choice) == 8) do
+	{
+		es_math m38 + 1
+		es_msg server_var(map38) has server_var(m38) votes
+	}
+	if (server_var(_popup_choice) == 9) do
+	{
+		es_math m39 + 1
+		es_msg server_var(map39) has server_var(m39) votes
+	}
+	if (server_var(_popup_choice) == 10) do
+	{
+		es_math m30 + 1
+		es_msg server_var(m30) votes to Extend Map
+	}
+}
+
+block chosenfinale
+{
+	if server_var(level) < 2) do
+	{
+		if (server_var(_popup_choice) == 1) do
+		{
+			es_math m11f + 1
+			es_msg server_var(map11f) has server_var(m11f) votes
+		}
+		if (server_var(_popup_choice) == 2) do
+		{
+			es_math m12f + 1
+			es_msg server_var(map12f) has server_var(m12f) votes
+		}
+		if (server_var(_popup_choice) == 3) do
+		{
+			es_math m13f + 1
+			es_msg server_var(map13f) has server_var(m13f) votes
+		}
+	}
+	if server_var(level) == 2) do
+	{
+		if (server_var(_popup_choice) == 1) do
+		{
+			es_math m21f + 1
+			es_msg server_var(map21f) has server_var(m21f) votes
+		}
+		if (server_var(_popup_choice) == 2) do
+		{
+			es_math m22f + 1
+			es_msg server_var(map22f) has server_var(m22f) votes
+		}
+		if (server_var(_popup_choice) == 3) do
+		{
+			es_math m23f + 1
+			es_msg server_var(map23f) has server_var(m23f) votes
+		}
+	}
+	if server_var(level) == 3) do
+	{
+		if (server_var(_popup_choice) == 1) do
+		{
+			es_math m31f + 1
+			es_msg server_var(map31f) has server_var(m31f) votes
+		}
+		if (server_var(_popup_choice) == 2) do
+		{
+			es_math m32f + 1
+			es_msg server_var(map32f) has server_var(m32f) votes
+		}
+		if (server_var(_popup_choice) == 3) do
+		{
+			es_math m33f + 1
+			es_msg server_var(map33f) has server_var(m33f) votes
+		}
+	}
+	if (server_var(_popup_choice) == 10) do
+	{
+		es_math m10f + 1
+		es_msg server_var(m10f) votes to Extend Map
+	}
+}
+
+block chosenfun1
+{
+	if (server_var(_popup_choice) == 1) do
+	{
+		es_math f1 + 1
+		es_msg server_var(funmap1) has server_var(f1) votes
+	}
+	if (server_var(_popup_choice) == 2) do
+	{
+		es_math f2 + 1
+		es_msg server_var(funmap2) has server_var(f2) votes
+	}
+	if (server_var(_popup_choice) == 3) do
+	{
+		es_math f3 + 1
+		es_msg server_var(funmap3) has server_var(f3) votes
+	}
+	if (server_var(_popup_choice) == 4) do
+	{
+		es_math f4 + 1
+		es_msg server_var(funmap4) has server_var(f4) votes
+	}
+	if (server_var(_popup_choice) == 5) do
+	{
+		es_math f5 + 1
+		es_msg server_var(funmap5) has server_var(f5) votes
+	}
+	if (server_var(_popup_choice) == 6) do
+	{
+		es_math f6 + 1
+		es_msg server_var(funmap6) has server_var(f6) votes
+	}
+	if (server_var(_popup_choice) == 7) do
+	{
+		es_math f7 + 1
+		es_msg server_var(funmap7) has server_var(f7) votes
+	}
+	if (server_var(_popup_choice) == 8) do
+	{
+		es_math f8 + 1
+		es_msg server_var(funmap8) has server_var(f8) votes
+	}
+	if (server_var(_popup_choice) == 9) do
+	{
+		es_math f9 + 1
+		es_msg server_var(funmap9) has server_var(f9) votes
+	}
+	if (server_var(_popup_choice) == 10) do
+	{
+		es_math f10 + 1
+		es_msg server_var(f10) votes to Extend Map
+	}
+}
+
+block unload
+{
+	popup close levelpick #all
+	popup close level0 #all
+	popup close level1 #all
+	popup close level2 #all
+	popup close level3 #all
+	popup close levelfinale #all
+	popup close levelfun1 #all
+	popup delete levelpick
+	popup delete level0
+	popup delete level1
+	popup delete level2
+	popup delete level3
+	popup delete levelfinale
+	popup delete levelfun1
+}
+
+event player_say
+{
+	if (event_var(text) == server_var(funmapvote)) do
+	{
+		es_xdoblock zombiecontainment/maplevels/levelfun1popup
+	}
+	if (event_var(text) == server_var(storyvote)) do
+	{
+		if server_var(switchgtfo) == 1 do	
+		{
+			es_xdoblock zombiecontainment/maplevels/levelpick1
+		}
+	}
+}
+
+block gtfoswitchon
+{	
+	es_xsetinfo switchgtfo 1
+}
+
+block gtfoswitchoff
+{	
+	es_xsetinfo switchgtfo 0
+}
+
+block levelpick1
+{
+	if (server_var(level) == 0) do
+	{
+		es_xsetinfo l1 0
+		es_xsetinfo l2 0
+		es_xsetinfo l3 0
+		es_xsetinfo l10 0
+		es popup send levelpick #all
+		es_delayed server_var(delaytime) es_xdoblock zombiecontainment/maplevels/calculatechoselevel1
+		es_delayed server_var(delaytime) popup close levelpick #all		
+	}
+	if (server_var(level) == 1) do
+	{
+		es_xdoblock zombiecontainment/maplevels/level1popup
+	}
+	if (server_var(level) == 2) do
+	{
+		es_xdoblock zombiecontainment/maplevels/level2popup
+	}
+	if (server_var(level) == 3) do
+	{
+		es_xdoblock zombiecontainment/maplevels/level3popup
+	}
+}
+
+block levelpickfinale
+{
+	es_xsetinfo m11f 0
+	es_xsetinfo m12f 0
+	es_xsetinfo m13f 0
+	es_xsetinfo m21f 0
+	es_xsetinfo m22f 0
+	es_xsetinfo m23f 0
+	es_xsetinfo m31f 0
+	es_xsetinfo m32f 0
+	es_xsetinfo m33f 0
+	es_xsetinfo m10f 0
+	es_xdoblock zombiecontainment/maplevels/buildfinalelevel
+}
+
+block buildfinalelevel
+{
+	popup create levelfinale
+	es popup addlinef levelfinale "%1" levelfinalename
+	popup addline levelfinale "-----------------"
+	if server_var(level) < 2) do
+	{
+		if (server_var(map11f) != 0) do
+		{
+			es popup addlinef levelfinale "->1. %1" map11f
+		}
+		if (server_var(map12f) != 0) do
+		{
+			es popup addlinef levelfinale "->2. %1" map12f
+		}
+		if (server_var(map13f) != 0) do
+		{
+			es popup addlinef levelfinale "->3. %1" map13f
+		}
+	}
+	elif server_var(level) == 2) do
+	{
+		if (server_var(map21f) != 0) do
+		{
+			es popup addlinef levelfinale "->1. %1" map21f
+		}
+		if (server_var(map22f) != 0) do
+		{
+			es popup addlinef levelfinale "->2. %1" map22f
+		}
+		if (server_var(map23f) != 0) do
+		{
+			es popup addlinef levelfinale "->3. %1" map23f
+		}
+	}
+	elif server_var(level) == 3) do
+	{
+		if (server_var(map31f) != 0) do
+		{
+			es popup addlinef levelfinale "->1. %1" map31f
+		}
+		if (server_var(map32f) != 0) do
+		{
+			es popup addlinef levelfinale "->2. %1" map32f
+		}
+		if (server_var(map33f) != 0) do
+		{
+			es popup addlinef levelfinale "->3. %1" map33f
+		}
+	}
+	popup addline levelfinale "-----------------"
+	popup addline levelfinale "->0. Extend this Map"
+	popup menuselect levelfinale zombiecontainment/maplevels/chosenfinale
+	es popup send levelfinale #all
+	es_delayed server_var(delaytime) es_xdoblock zombiecontainment/maplevels/calculatefinale1
+	es_delayed server_var(delaytime) popup close levelfinale #all
+}
+
+block level0popup
+{
+	es_xsetinfo l01 0
+	es_xsetinfo l02 0
+	es_xsetinfo l03 0
+	es_xsetinfo l010 0
+	es popup send level0 #all
+	es_delayed server_var(delaytime) es_xdoblock zombiecontainment/maplevels/calculate01
+	es_delayed server_var(delaytime) popup close level0 #all
+}
+	
+block level1popup
+{
+	es_xsetinfo m11 0
+	es_xsetinfo m12 0
+	es_xsetinfo m13 0
+	es_xsetinfo m14 0
+	es_xsetinfo m15 0
+	es_xsetinfo m16 0
+	es_xsetinfo m17 0
+	es_xsetinfo m18 0
+	es_xsetinfo m19 0
+	es_xsetinfo m10 0
+	es popup send level1 #all
+	es_delayed server_var(delaytime) es_xdoblock zombiecontainment/maplevels/calculate11
+	es_delayed server_var(delaytime) popup close level1 #all
+}
+
+block level2popup
+{
+	es_xsetinfo m21 0
+	es_xsetinfo m22 0
+	es_xsetinfo m23 0
+	es_xsetinfo m24 0
+	es_xsetinfo m25 0
+	es_xsetinfo m26 0
+	es_xsetinfo m27 0
+	es_xsetinfo m28 0
+	es_xsetinfo m29 0
+	es_xsetinfo m20 0
+	es popup send level2 #all
+	es_delayed server_var(delaytime) es_xdoblock zombiecontainment/maplevels/calculate21
+	es_delayed server_var(delaytime) popup close level2 #all
+}
+
+block level3popup
+{
+	es_xsetinfo m31 0
+	es_xsetinfo m32 0
+	es_xsetinfo m33 0
+	es_xsetinfo m34 0
+	es_xsetinfo m35 0
+	es_xsetinfo m36 0
+	es_xsetinfo m37 0
+	es_xsetinfo m38 0
+	es_xsetinfo m39 0
+	es_xsetinfo m30 0
+	es popup send level3 #all
+	es_delayed server_var(delaytime) es_xdoblock zombiecontainment/maplevels/calculate31
+	es_delayed server_var(delaytime) popup close level3 #all
+} 
+
+block levelfun1popup
+{
+	es_xsetinfo f1 0
+	es_xsetinfo f2 0
+	es_xsetinfo f3 0
+	es_xsetinfo f4 0
+	es_xsetinfo f5 0
+	es_xsetinfo f6 0
+	es_xsetinfo f7 0
+	es_xsetinfo f8 0
+	es_xsetinfo f9 0
+	es_xsetinfo f10 0
+	es popup send levelfun1 #all
+	es_delayed server_var(delaytime) es_xdoblock zombiecontainment/maplevels/calculatefun1
+	es_delayed server_var(delaytime) popup close levelfun1 #all
+} 
+
+block reset
+{
+	popup close levelpick #all
+	popup close level0 #all
+	popup close level1 #all
+	popup close level2 #all
+	popup close level3 #all
+	popup close levelfun1 #all
+	es_xsetinfo level 0
+	es_xsetinfo m11 0
+	es_xsetinfo m12 0
+	es_xsetinfo m13 0
+	es_xsetinfo m14 0
+	es_xsetinfo m15 0
+	es_xsetinfo m16 0
+	es_xsetinfo m17 0
+	es_xsetinfo m18 0
+	es_xsetinfo m19 0
+	es_xsetinfo m10 0
+	es_xsetinfo m21 0
+	es_xsetinfo m22 0
+	es_xsetinfo m23 0
+	es_xsetinfo m24 0
+	es_xsetinfo m25 0
+	es_xsetinfo m26 0
+	es_xsetinfo m27 0
+	es_xsetinfo m28 0
+	es_xsetinfo m29 0
+	es_xsetinfo m20 0
+	es_xsetinfo m31 0
+	es_xsetinfo m32 0
+	es_xsetinfo m33 0
+	es_xsetinfo m34 0
+	es_xsetinfo m35 0
+	es_xsetinfo m36 0
+	es_xsetinfo m37 0
+	es_xsetinfo m38 0
+	es_xsetinfo m39 0
+	es_xsetinfo m30 0
+	es_xsetinfo m11f 0
+	es_xsetinfo m12f 0
+	es_xsetinfo m13f 0
+	es_xsetinfo m21f 0
+	es_xsetinfo m22f 0
+	es_xsetinfo m23f 0
+	es_xsetinfo m31f 0
+	es_xsetinfo m32f 0
+	es_xsetinfo m33f 0
+	es_xsetinfo m10f 0
+	es_xsetinfo f1 0
+	es_xsetinfo f2 0
+	es_xsetinfo f3 0
+	es_xsetinfo f4 0
+	es_xsetinfo f5 0
+	es_xsetinfo f6 0
+	es_xsetinfo f7 0
+	es_xsetinfo f8 0
+	es_xsetinfo f9 0
+	es_xsetinfo f10 0
+	es_xsetinfo l1 0
+	es_xsetinfo l2 0
+	es_xsetinfo l3 0
+	es_xsetinfo l10 0
+	es_xsetinfo l01 0
+	es_xsetinfo l02 0
+	es_xsetinfo l03 0
+	es_xsetinfo l010 0
+	es_xdoblock zombiecontainment/maplevels/level0popup
+}
+
+
+
+
+block calculate11
+{
+	if (server_var(m11) > server_var(m12)) do
+	{
+		if (server_var(m11) > server_var(m13)) do
+		{
+			if (server_var(m11) > server_var(m14)) do
+			{
+				if (server_var(m11) > server_var(m15)) do
+				{
+					if (server_var(m11) > server_var(m16)) do
+					{
+						if (server_var(m11) > server_var(m17)) do
+						{
+							if (server_var(m11) > server_var(m18)) do
+							{
+								if (server_var(m11) > server_var(m19)) do
+								{
+									if (server_var(m11) > server_var(m10)) do
+									{
+										es_delayed 1 changelevel server_var(map11)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate12
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate12
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate12
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate12
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate12
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate12
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate12
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate12
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate12
+	}
+}
+
+block calculate12
+{
+	if (server_var(m12) > server_var(m11)) do
+	{
+		if (server_var(m12) > server_var(m13)) do
+		{
+			if (server_var(m12) > server_var(m14)) do
+			{
+				if (server_var(m12) > server_var(m15)) do
+				{
+					if (server_var(m12) > server_var(m16)) do
+					{
+						if (server_var(m12) > server_var(m17)) do
+						{
+							if (server_var(m12) > server_var(m18)) do
+							{
+								if (server_var(m12) > server_var(m19)) do
+								{
+									if (server_var(m12) > server_var(m10)) do
+									{
+										es_delayed 1 changelevel server_var(map12)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate13
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate13
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate13
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate13
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate13
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate13
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate13
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate13
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate13
+	}
+}
+
+block calculate13
+{
+	if (server_var(m13) > server_var(m11)) do
+	{
+		if (server_var(m13) > server_var(m12)) do
+		{
+			if (server_var(m13) > server_var(m14)) do
+			{
+				if (server_var(m13) > server_var(m15)) do
+				{
+					if (server_var(m13) > server_var(m16)) do
+					{
+						if (server_var(m13) > server_var(m17)) do
+						{
+							if (server_var(m13) > server_var(m18) do
+							{
+								if (server_var(m13) > server_var(m19)) do
+								{
+									if (server_var(m13) > server_var(m10)) do
+									{
+										es_delayed 1 changelevel server_var(map13)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate14
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate14
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate14
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate14
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate14
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate14
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate14
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate14
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate14
+	}
+}
+
+block calculate14
+{
+	if (server_var(m14) > server_var(m11)) do
+	{
+		if (server_var(m14) > server_var(m13)) do
+		{
+			if (server_var(m14) > server_var(m12)) do
+			{
+				if (server_var(m14) > server_var(m15)) do
+				{
+					if (server_var(m14) > server_var(m16)) do
+					{
+						if (server_var(m14) > server_var(m17)) do
+						{
+							if (server_var(m14) > server_var(m18)) do
+							{
+								if (server_var(m14) > server_var(m19)) do
+								{
+									if (server_var(m14) > server_var(m10)) do
+									{
+										es_delayed 1 changelevel server_var(map14)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate15
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate15
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate15
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate15
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate15
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate15
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate15
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate15
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate15
+	}
+}
+
+block calculate15
+{
+	if (server_var(m15) > server_var(m11)) do
+	{
+		if (server_var(m15) > server_var(m13)) do
+		{
+			if (server_var(m15) > server_var(m14)) do
+			{
+				if (server_var(m15) > server_var(m12)) do
+				{
+					if (server_var(m15) > server_var(m16)) do
+					{
+						if (server_var(m15) > server_var(m17)) do
+						{
+							if (server_var(m15) > server_var(m18)) do
+							{
+								if (server_var(m15) > server_var(m19)) do
+								{
+									if (server_var(m15) > server_var(m12)) do
+									{
+										es_delayed 1 changelevel server_var(map15)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate16
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate16
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate16
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate16
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate16
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate16
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate16
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate16
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate16
+	}
+}
+
+block calculate16
+{
+	if (server_var(m16) > server_var(m11)) do
+	{
+		if (server_var(m16) > server_var(m13)) do
+		{
+			if (server_var(m16) > server_var(m14)) do
+			{
+				if (server_var(m16) > server_var(m15)) do
+				{
+					if (server_var(m16) > server_var(m12)) do
+					{
+						if (server_var(m16) > server_var(m17)) do
+						{
+							if (server_var(m16) > server_var(m18)) do
+							{
+								if (server_var(m16) > server_var(m19)) do
+								{
+									if (server_var(m16) > server_var(m10)) do
+									{
+										es_delayed 1 changelevel server_var(map16)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate17
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate17
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate17
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate17
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate17
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate17
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate17
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate17
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate17
+	}
+}
+
+block calculate17
+{
+	if (server_var(m17) > server_var(m11)) do
+	{
+		if (server_var(m17) > server_var(m13)) do
+		{
+			if (server_var(m17) > server_var(m14)) do
+			{
+				if (server_var(m17) > server_var(m15)) do
+				{
+					if (server_var(m17) > server_var(m16)) do
+					{
+						if (server_var(m17) > server_var(m12)) do
+						{
+							if (server_var(m17) > server_var(m18)) do
+							{
+								if (server_var(m17) > server_var(m19)) do
+								{
+									if (server_var(m17) > server_var(m10)) do
+									{
+										es_delayed 1 changelevel server_var(map17)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate18
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate18
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate18
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate18
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate18
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate18
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate18
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate18
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate18
+	}
+}
+
+block calculate18
+{
+	if (server_var(m18) > server_var(m11)) do
+	{
+		if (server_var(m18) > server_var(m13)) do
+		{
+			if (server_var(m18) > server_var(m14)) do
+			{
+				if (server_var(m18) > server_var(m15)) do
+				{
+					if (server_var(m18) > server_var(m16)) do
+					{
+						if (server_var(m18) > server_var(m17)) do
+						{
+							if (server_var(m18) > server_var(m12)) do
+							{
+								if (server_var(m18) > server_var(m19)) do
+								{
+									if (server_var(m18) > server_var(m10)) do
+									{
+										es_delayed 1 changelevel server_var(map18)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate19
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate19
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate19
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate19
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate19
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate19
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate19
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate19
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate19
+	}
+}
+
+block calculate19
+{
+	if (server_var(m19) > server_var(m11)) do
+	{
+		if (server_var(m19) > server_var(m13)) do
+		{
+			if (server_var(m19) > server_var(m14)) do
+			{
+				if (server_var(m19) > server_var(m15)) do
+				{
+					if (server_var(m19) > server_var(m16)) do
+					{
+						if (server_var(m19) > server_var(m17)) do
+						{
+							if (server_var(m19) > server_var(m18)) do
+							{
+								if (server_var(m19) > server_var(m12)) do
+								{
+									if (server_var(m19) > server_var(m10)) do
+									{
+										es_delayed 1 changelevel server_var(map19)
+									}
+									else do
+									{
+										es_msg extending this map
+									}
+								}
+								else do
+								{
+									es_msg extending this map
+								}
+							}
+							else do
+							{
+								es_msg extending this map
+							}
+						}
+						else do
+						{
+							es_msg extending this map
+						}
+					}
+					else do
+					{
+						es_msg extending this map
+					}
+				}
+				else do
+				{
+					es_msg extending this map
+				}
+			}
+			else do
+			{
+				es_msg extending this map
+			}
+		}
+		else do
+		{
+			es_msg extending this map
+		}
+	}
+	else do
+	{
+		es_msg extending this map
+	}
+}
+
+
+block calculate21
+{
+	if (server_var(m21) > server_var(m22)) do
+	{
+		if (server_var(m21) > server_var(m23)) do
+		{
+			if (server_var(m21) > server_var(m24)) do
+			{
+				if (server_var(m21) > server_var(m25)) do
+				{
+					if (server_var(m21) > server_var(m26)) do
+					{
+						if (server_var(m21) > server_var(m27)) do
+						{
+							if (server_var(m21) > server_var(m28)) do
+							{
+								if (server_var(m21) > server_var(m29)) do
+								{
+									if (server_var(m21) > server_var(m20)) do
+									{
+										es_delayed 1 changelevel server_var(map21)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate22
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate22
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate22
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate22
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate22
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate22
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate22
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate22
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate22
+	}
+}
+
+block calculate22
+{
+	if (server_var(m22) > server_var(m21)) do
+	{
+		if (server_var(m22) > server_var(m23)) do
+		{
+			if (server_var(m22) > server_var(m24)) do
+			{
+				if (server_var(m22) > server_var(m25)) do
+				{
+					if (server_var(m22) > server_var(m26)) do
+					{
+						if (server_var(m22) > server_var(m27)) do
+						{
+							if (server_var(m22) > server_var(m28)) do
+							{
+								if (server_var(m22) > server_var(m29)) do
+								{
+									if (server_var(m22) > server_var(m20)) do
+									{
+										es_delayed 1 changelevel server_var(map22)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate23
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate23
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate23
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate23
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate23
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate23
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate23
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate23
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate23
+	}
+}
+
+block calculate23
+{
+	if (server_var(m23) > server_var(m21)) do
+	{
+		if (server_var(m23) > server_var(m22)) do
+		{
+			if (server_var(m23) > server_var(m24)) do
+			{
+				if (server_var(m23) > server_var(m25)) do
+				{
+					if (server_var(m23) > server_var(m26)) do
+					{
+						if (server_var(m23) > server_var(m27)) do
+						{
+							if (server_var(m23) > server_var(m28) do
+							{
+								if (server_var(m23) > server_var(m29)) do
+								{
+									if (server_var(m23) > server_var(m20)) do
+									{
+										es_delayed 1 changelevel server_var(map23)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate24
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate24
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate24
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate24
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate24
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate24
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate24
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate24
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate24
+	}
+}
+
+block calculate24
+{
+	if (server_var(m24) > server_var(m21)) do
+	{
+		if (server_var(m24) > server_var(m23)) do
+		{
+			if (server_var(m24) > server_var(m22)) do
+			{
+				if (server_var(m24) > server_var(m25)) do
+				{
+					if (server_var(m24) > server_var(m26)) do
+					{
+						if (server_var(m24) > server_var(m27)) do
+						{
+							if (server_var(m24) > server_var(m28)) do
+							{
+								if (server_var(m24) > server_var(m29)) do
+								{
+									if (server_var(m24) > server_var(m20)) do
+									{
+										es_delayed 1 changelevel server_var(map24)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate25
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate25
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate25
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate25
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate25
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate25
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate25
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate25
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate25
+	}
+}
+
+block calculate25
+{
+	if (server_var(m25) > server_var(m21)) do
+	{
+		if (server_var(m25) > server_var(m23)) do
+		{
+			if (server_var(m25) > server_var(m24)) do
+			{
+				if (server_var(m25) > server_var(m22)) do
+				{
+					if (server_var(m25) > server_var(m26)) do
+					{
+						if (server_var(m25) > server_var(m27)) do
+						{
+							if (server_var(m25) > server_var(m28)) do
+							{
+								if (server_var(m25) > server_var(m29)) do
+								{
+									if (server_var(m25) > server_var(m32)) do
+									{
+										es_delayed 1 changelevel server_var(map25)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate26
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate26
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate26
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate26
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate26
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate26
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate26
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate26
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate26
+	}
+}
+
+block calculate26
+{
+	if (server_var(m26) > server_var(m21)) do
+	{
+		if (server_var(m26) > server_var(m23)) do
+		{
+			if (server_var(m26) > server_var(m24)) do
+			{
+				if (server_var(m26) > server_var(m25)) do
+				{
+					if (server_var(m26) > server_var(m22)) do
+					{
+						if (server_var(m26) > server_var(m27)) do
+						{
+							if (server_var(m26) > server_var(m28)) do
+							{
+								if (server_var(m26) > server_var(m29)) do
+								{
+									if (server_var(m26) > server_var(m20)) do
+									{
+										es_delayed 1 changelevel server_var(map26)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate27
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate27
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate27
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate27
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate27
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate27
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate27
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate27
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate27
+	}
+}
+
+block calculate27
+{
+	if (server_var(m27) > server_var(m21)) do
+	{
+		if (server_var(m27) > server_var(m23)) do
+		{
+			if (server_var(m27) > server_var(m24)) do
+			{
+				if (server_var(m27) > server_var(m25)) do
+				{
+					if (server_var(m27) > server_var(m26)) do
+					{
+						if (server_var(m27) > server_var(m22)) do
+						{
+							if (server_var(m27) > server_var(m28)) do
+							{
+								if (server_var(m27) > server_var(m29)) do
+								{
+									if (server_var(m27) > server_var(m20)) do
+									{
+										es_delayed 1 changelevel server_var(map27)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate28
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate28
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate28
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate28
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate28
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate28
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate28
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate28
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate28
+	}
+}
+
+block calculate28
+{
+	if (server_var(m28) > server_var(m21)) do
+	{
+		if (server_var(m28) > server_var(m23)) do
+		{
+			if (server_var(m28) > server_var(m24)) do
+			{
+				if (server_var(m28) > server_var(m25)) do
+				{
+					if (server_var(m28) > server_var(m26)) do
+					{
+						if (server_var(m28) > server_var(m27)) do
+						{
+							if (server_var(m28) > server_var(m22)) do
+							{
+								if (server_var(m28) > server_var(m29)) do
+								{
+									if (server_var(m28) > server_var(m20)) do
+									{
+										es_delayed 1 changelevel server_var(map28)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate29
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate29
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate29
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate29
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate29
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate29
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate29
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate29
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate29
+	}
+}
+
+block calculate29
+{
+	if (server_var(m29) > server_var(m21)) do
+	{
+		if (server_var(m29) > server_var(m23)) do
+		{
+			if (server_var(m29) > server_var(m24)) do
+			{
+				if (server_var(m29) > server_var(m25)) do
+				{
+					if (server_var(m29) > server_var(m26)) do
+					{
+						if (server_var(m29) > server_var(m27)) do
+						{
+							if (server_var(m29) > server_var(m28)) do
+							{
+								if (server_var(m29) > server_var(m22)) do
+								{
+									if (server_var(m29) > server_var(m20)) do
+									{
+										es_delayed 1 changelevel server_var(map29)
+									}
+									else do
+									{
+										es_msg extending this map
+									}
+								}
+								else do
+								{
+									es_msg extending this map
+								}
+							}
+							else do
+							{
+								es_msg extending this map
+							}
+						}
+						else do
+						{
+							es_msg extending this map
+						}
+					}
+					else do
+					{
+						es_msg extending this map
+					}
+				}
+				else do
+				{
+					es_msg extending this map
+				}
+			}
+			else do
+			{
+				es_msg extending this map
+			}
+		}
+		else do
+		{
+			es_msg extending this map
+		}
+	}
+	else do
+	{
+		es_msg extending this map
+	}
+}
+
+
+block calculate31
+{
+	if (server_var(m31) > server_var(m32)) do
+	{
+		if (server_var(m31) > server_var(m33)) do
+		{
+			if (server_var(m31) > server_var(m34)) do
+			{
+				if (server_var(m31) > server_var(m35)) do
+				{
+					if (server_var(m31) > server_var(m36)) do
+					{
+						if (server_var(m31) > server_var(m37)) do
+						{
+							if (server_var(m31) > server_var(m38)) do
+							{
+								if (server_var(m31) > server_var(m39)) do
+								{
+									if (server_var(m31) > server_var(m30)) do
+									{
+										es_delayed 1 changelevel server_var(map31)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate32
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate32
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate32
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate32
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate32
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate32
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate32
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate32
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate32
+	}
+}
+
+block calculate32
+{
+	if (server_var(m32) > server_var(m31)) do
+	{
+		if (server_var(m32) > server_var(m33)) do
+		{
+			if (server_var(m32) > server_var(m34)) do
+			{
+				if (server_var(m32) > server_var(m35)) do
+				{
+					if (server_var(m32) > server_var(m36)) do
+					{
+						if (server_var(m32) > server_var(m37)) do
+						{
+							if (server_var(m32) > server_var(m38)) do
+							{
+								if (server_var(m32) > server_var(m39)) do
+								{
+									if (server_var(m32) > server_var(m30)) do
+									{
+										es_delayed 1 changelevel server_var(map32)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate33
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate33
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate33
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate33
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate33
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate33
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate33
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate33
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate33
+	}
+}
+
+block calculate33
+{
+	if (server_var(m33) > server_var(m31)) do
+	{
+		if (server_var(m33) > server_var(m32)) do
+		{
+			if (server_var(m33) > server_var(m34)) do
+			{
+				if (server_var(m33) > server_var(m35)) do
+				{
+					if (server_var(m33) > server_var(m36)) do
+					{
+						if (server_var(m33) > server_var(m37)) do
+						{
+							if (server_var(m33) > server_var(m38)) do
+							{
+								if (server_var(m33) > server_var(m39)) do
+								{
+									if (server_var(m33) > server_var(m30)) do
+									{
+										es_delayed 1 changelevel server_var(map33)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate34
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate34
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate34
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate34
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate34
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate34
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate34
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate34
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate34
+	}
+}
+
+block calculate34
+{
+	if (server_var(m34) > server_var(m31)) do
+	{
+		if (server_var(m34) > server_var(m33)) do
+		{
+			if (server_var(m34) > server_var(m32)) do
+			{
+				if (server_var(m34) > server_var(m35)) do
+				{
+					if (server_var(m34) > server_var(m36)) do
+					{
+						if (server_var(m34) > server_var(m37)) do
+						{
+							if (server_var(m34) > server_var(m38)) do
+							{
+								if (server_var(m34) > server_var(m39)) do
+								{
+									if (server_var(m34) > server_var(m30)) do
+									{
+										es_delayed 1 changelevel server_var(map34)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate35
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate35
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate35
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate35
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate35
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate35
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate35
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate35
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate35
+	}
+}
+
+block calculate35
+{
+	if (server_var(m35) > server_var(m31)) do
+	{
+		if (server_var(m35) > server_var(m33)) do
+		{
+			if (server_var(m35) > server_var(m34)) do
+			{
+				if (server_var(m35) > server_var(m32)) do
+				{
+					if (server_var(m35) > server_var(m36)) do
+					{
+						if (server_var(m35) > server_var(m37)) do
+						{
+							if (server_var(m35) > server_var(m38)) do
+							{
+								if (server_var(m35) > server_var(m39)) do
+								{
+									if (server_var(m35) > server_var(m30)) do
+									{
+										es_delayed 1 changelevel server_var(map35)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate36
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate36
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate36
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate36
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate36
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate36
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate36
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate36
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate36
+	}
+}
+
+block calculate36
+{
+	if (server_var(m36) > server_var(m31)) do
+	{
+		if (server_var(m36) > server_var(m33)) do
+		{
+			if (server_var(m36) > server_var(m34)) do
+			{
+				if (server_var(m36) > server_var(m35)) do
+				{
+					if (server_var(m36) > server_var(m32)) do
+					{
+						if (server_var(m36) > server_var(m37)) do
+						{
+							if (server_var(m36) > server_var(m38)) do
+							{
+								if (server_var(m36) > server_var(m39)) do
+								{
+									if (server_var(m36) > server_var(m30)) do
+									{
+										es_delayed 1 changelevel server_var(map36)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate37
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate37
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate37
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate37
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate37
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate37
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate37
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate37
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate37
+	}
+}
+
+block calculate37
+{
+	if (server_var(m37) > server_var(m31)) do
+	{
+		if (server_var(m37) > server_var(m33)) do
+		{
+			if (server_var(m37) > server_var(m34)) do
+			{
+				if (server_var(m37) > server_var(m35)) do
+				{
+					if (server_var(m37) > server_var(m36)) do
+					{
+						if (server_var(m37) > server_var(m32)) do
+						{
+							if (server_var(m37) > server_var(m38)) do
+							{
+								if (server_var(m37) > server_var(m39)) do
+								{
+									if (server_var(m37) > server_var(m30)) do
+									{
+										es_delayed 1 changelevel server_var(map37)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate38
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate38
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate38
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate38
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate38
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate38
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate38
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate38
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate38
+	}
+}
+
+block calculate38
+{
+	if (server_var(m38) > server_var(m31)) do
+	{
+		if (server_var(m38) > server_var(m33)) do
+		{
+			if (server_var(m38) > server_var(m34)) do
+			{
+				if (server_var(m38) > server_var(m35)) do
+				{
+					if (server_var(m38) > server_var(m36)) do
+					{
+						if (server_var(m38) > server_var(m37)) do
+						{
+							if (server_var(m38) > server_var(m32)) do
+							{
+								if (server_var(m38) > server_var(m39)) do
+								{
+									if (server_var(m38) > server_var(m30)) do
+									{
+										es_delayed 1 changelevel server_var(map38)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculate39
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculate39
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculate39
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculate39
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculate39
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculate39
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculate39
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculate39
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculate39
+	}
+}
+
+block calculate39
+{
+	if (server_var(m39) > server_var(m31)) do
+	{
+		if (server_var(m39) > server_var(m33)) do
+		{
+			if (server_var(m39) > server_var(m34)) do
+			{
+				if (server_var(m39) > server_var(m35)) do
+				{
+					if (server_var(m39) > server_var(m36)) do
+					{
+						if (server_var(m39) > server_var(m37)) do
+						{
+							if (server_var(m39) > server_var(m38)) do
+							{
+								if (server_var(m39) > server_var(m32)) do
+								{
+									if (server_var(m39) > server_var(m30)) do
+									{
+										es_delayed 1 changelevel server_var(map39)
+									}
+									else do
+									{
+										es_msg extending this map
+									}
+								}
+								else do
+								{
+									es_msg extending this map
+								}
+							}
+							else do
+							{
+								es_msg extending this map
+							}
+						}
+						else do
+						{
+							es_msg extending this map
+						}
+					}
+					else do
+					{
+						es_msg extending this map
+					}
+				}
+				else do
+				{
+					es_msg extending this map
+				}
+			}
+			else do
+			{
+				es_msg extending this map
+			}
+		}
+		else do
+		{
+			es_msg extending this map
+		}
+	}
+	else do
+	{
+		es_msg extending this map
+	}
+}
+
+block calculatefinale1
+{
+	if (server_var(level) < 2) do
+	{
+		if (server_var(m11f) > server_var(m12f)) do
+		{
+			if (server_var(m11f) > server_var(m13f)) do
+			{
+				if (server_var(m11f) > server_var(m10f)) do
+				{
+					es_delayed 1 changelevel server_var(map11f)
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefinale2
+				}
+			}
+		}
+	}
+	elif (server_var(level) == 2) do
+	{
+		if (server_var(m21f) > server_var(m22f)) do
+		{
+			if (server_var(m21f) > server_var(m23f)) do
+			{
+				if (server_var(m21f) > server_var(m10f)) do
+				{
+					es_delayed 1 changelevel server_var(map21f)
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefinale2
+				}
+			}
+		}
+	}
+	elif (server_var(level) == 3) do
+	{
+		if (server_var(m31f) > server_var(m32f)) do
+		{
+			if (server_var(m31f) > server_var(m33f)) do
+			{
+				if (server_var(m31f) > server_var(m10f)) do
+				{
+					es_delayed 1 changelevel server_var(map31f)
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefinale2
+				}
+			}
+		}
+	}
+}
+
+block calculatefinale2
+{
+	if (server_var(level) < 2) do
+	{
+		if (server_var(m12f) > server_var(m11f)) do
+		{
+			if (server_var(m12f) > server_var(m13f)) do
+			{
+				if (server_var(m12f) > server_var(m10f)) do
+				{
+					es_delayed 1 changelevel server_var(map12f)
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefinale3
+				}
+			}
+		}
+	}
+	elif (server_var(level) == 2) do
+	{
+		if (server_var(m22f) > server_var(m21f)) do
+		{
+			if (server_var(m22f) > server_var(m23f)) do
+			{
+				if (server_var(m22f) > server_var(m10f)) do
+				{
+					es_delayed 1 changelevel server_var(map22f)
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefinale3
+				}
+			}
+		}
+	}
+	elif (server_var(level) == 3) do
+	{
+		if (server_var(m32f) > server_var(m31f)) do
+		{
+			if (server_var(m32f) > server_var(m33f)) do
+			{
+				if (server_var(m32f) > server_var(m10f)) do
+				{
+					es_delayed 1 changelevel server_var(map32f)
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefinale3
+				}
+			}
+		}
+	}
+}
+
+block calculatefinale3
+{
+	if (server_var(level) < 2) do
+	{
+		if (server_var(m13f) > server_var(m12f)) do
+		{
+			if (server_var(m13f) > server_var(m11f)) do
+			{
+				if (server_var(m13f) > server_var(m10f)) do
+				{
+					es_delayed 1 changelevel server_var(map13f)
+				}
+				else do
+				{
+					es_msg extending this map
+				}
+			}
+			else do
+			{
+				es_msg extending this map	
+			}
+		}
+		else do
+		{
+			es_msg extending this map
+		}
+	}
+	elif (server_var(level) == 2) do
+	{
+		if (server_var(m23f) > server_var(m22f)) do
+		{
+			if (server_var(m23f) > server_var(m21f)) do
+			{
+				if (server_var(m23f) > server_var(m10f)) do
+				{
+					es_delayed 1 changelevel server_var(map23f)
+				}
+				else do
+				{
+					es_msg extending this map
+				}
+			}
+			else do
+			{
+				es_msg extending this map	
+			}
+		}
+		else do
+		{
+			es_msg extending this map
+		}
+	}
+	elif (server_var(level) == 3) do
+	{
+		if (server_var(m33f) > server_var(m32f)) do
+		{
+			if (server_var(m33f) > server_var(m32f)) do
+			{
+				if (server_var(m33f) > server_var(m10f)) do
+				{
+					es_delayed 1 changelevel server_var(map33f)
+				}
+				else do
+				{
+					es_msg extending this map
+				}
+			}
+			else do
+			{
+				es_msg extending this map	
+			}
+		}
+		else do
+		{
+			es_msg extending this map
+		}
+	}
+}
+
+block calculatefun1
+{
+	if (server_var(f1) > server_var(f2)) do
+	{
+		if (server_var(f1) > server_var(f3)) do
+		{
+			if (server_var(f1) > server_var(f4)) do
+			{
+				if (server_var(f1) > server_var(f5)) do
+				{
+					if (server_var(f1) > server_var(f6)) do
+					{
+						if (server_var(f1) > server_var(f7)) do
+						{
+							if (server_var(f1) > server_var(f8)) do
+							{
+								if (server_var(f1) > server_var(f9)) do
+								{
+									if (server_var(f1) > server_var(f10)) do
+									{
+										es_delayed 1 changelevel server_var(funmap1)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculatefun2
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculatefun2
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculatefun2
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculatefun2
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculatefun2
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefun2
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatefun2
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatefun2
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatefun2
+	}
+}
+
+block calculatefun2
+{
+	if (server_var(f2) > server_var(f1)) do
+	{
+		if (server_var(f2) > server_var(f3)) do
+		{
+			if (server_var(f2) > server_var(f4)) do
+			{
+				if (server_var(f2) > server_var(f5)) do
+				{
+					if (server_var(f2) > server_var(f6)) do
+					{
+						if (server_var(f2) > server_var(f7)) do
+						{
+							if (server_var(f2) > server_var(f8)) do
+							{
+								if (server_var(f2) > server_var(f9)) do
+								{
+									if (server_var(f2) > server_var(f10)) do
+									{
+										es_delayed 1 changelevel server_var(funmap2)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculatefun3
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculatefun3
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculatefun3
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculatefun3
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculatefun3
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefun3
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatefun3
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatefun3
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatefun3
+	}
+}
+
+block calculatefun3
+{
+	if (server_var(f3) > server_var(f1)) do
+	{
+		if (server_var(f3) > server_var(f2)) do
+		{
+			if (server_var(f3) > server_var(f4)) do
+			{
+				if (server_var(f3) > server_var(f5)) do
+				{
+					if (server_var(f3) > server_var(f6)) do
+					{
+						if (server_var(f3) > server_var(f7)) do
+						{
+							if (server_var(f3) > server_var(f8)) do
+							{
+								if (server_var(f3) > server_var(f9)) do
+								{
+									if (server_var(f3) > server_var(f10)) do
+									{
+										es_delayed 1 changelevel server_var(funmap3)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculatefun4
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculatefun4
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculatefun4
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculatefun4
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculatefun4
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefun4
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatefun4
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatefun4
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatefun4
+	}
+}
+
+block calculatefun4
+{
+	if (server_var(f4) > server_var(f1)) do
+	{
+		if (server_var(f4) > server_var(f3)) do
+		{
+			if (server_var(f4) > server_var(f2)) do
+			{
+				if (server_var(f4) > server_var(f5)) do
+				{
+					if (server_var(f4) > server_var(f6)) do
+					{
+						if (server_var(f4) > server_var(f7)) do
+						{
+							if (server_var(f4) > server_var(f8)) do
+							{
+								if (server_var(f4) > server_var(f9)) do
+								{
+									if (server_var(f4) > server_var(f10)) do
+									{
+										es_delayed 1 changelevel server_var(funmap4)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculatefun5
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculatefun5
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculatefun5
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculatefun5
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculatefun5
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefun5
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatefun5
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatefun5
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatefun5
+	}
+}
+
+block calculatefun5
+{
+	if (server_var(f5) > server_var(f1)) do
+	{
+		if (server_var(f5) > server_var(f3)) do
+		{
+			if (server_var(f5) > server_var(f4)) do
+			{
+				if (server_var(f5) > server_var(f2)) do
+				{
+					if (server_var(f5) > server_var(f6)) do
+					{
+						if (server_var(f5) > server_var(f7)) do
+						{
+							if (server_var(f5) > server_var(f8)) do
+							{
+								if (server_var(f5) > server_var(f9)) do
+								{
+									if (server_var(f5) > server_var(f10)) do
+									{
+										es_delayed 1 changelevel server_var(funmap5)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculatefun6
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculatefun6
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculatefun6
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculatefun6
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculatefun6
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefun6
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatefun6
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatefun6
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatefun6
+	}
+}
+
+block calculatefun6
+{
+	if (server_var(f6) > server_var(f1)) do
+	{
+		if (server_var(f6) > server_var(f3)) do
+		{
+			if (server_var(f6) > server_var(f4)) do
+			{
+				if (server_var(f6) > server_var(f5)) do
+				{
+					if (server_var(f6) > server_var(f2)) do
+					{
+						if (server_var(f6) > server_var(f7)) do
+						{
+							if (server_var(f6) > server_var(f8)) do
+							{
+								if (server_var(f6) > server_var(f9)) do
+								{
+									if (server_var(f6) > server_var(f10)) do
+									{
+										es_delayed 1 changelevel server_var(funmap6)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculatefun7
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculatefun7
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculatefun7
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculatefun7
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculatefun7
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefun7
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatefun7
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatefun7
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatefun7
+	}
+}
+
+block calculatefun7
+{
+	if (server_var(f7) > server_var(f1)) do
+	{
+		if (server_var(f7) > server_var(f3)) do
+		{
+			if (server_var(f7) > server_var(f4)) do
+			{
+				if (server_var(f7) > server_var(f5)) do
+				{
+					if (server_var(f7) > server_var(f6)) do
+					{
+						if (server_var(f7) > server_var(f2)) do
+						{
+							if (server_var(f7) > server_var(f8)) do
+							{
+								if (server_var(f7) > server_var(f9)) do
+								{
+									if (server_var(f7) > server_var(f10)) do
+									{
+										es_delayed 1 changelevel server_var(funmap7)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculatefun8
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculatefun8
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculatefun8
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculatefun8
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculatefun8
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefun8
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatefun8
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatefun8
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatefun8
+	}
+}
+
+block calculatefun8
+{
+	if (server_var(f8) > server_var(f1)) do
+	{
+		if (server_var(f8) > server_var(f3)) do
+		{
+			if (server_var(f8) > server_var(f4)) do
+			{
+				if (server_var(f8) > server_var(f5)) do
+				{
+					if (server_var(f8) > server_var(f6)) do
+					{
+						if (server_var(f8) > server_var(f7)) do
+						{
+							if (server_var(f8) > server_var(f2)) do
+							{
+								if (server_var(f8) > server_var(f9)) do
+								{
+									if (server_var(f8) > server_var(f10)) do
+									{
+										es_delayed 1 changelevel server_var(funmap8)
+									}
+									else do
+									{
+										es_xdoblock zombiecontainment/maplevels/calculatefun9
+									}
+								}
+								else do
+								{
+									es_xdoblock zombiecontainment/maplevels/calculatefun9
+								}
+							}
+							else do
+							{
+								es_xdoblock zombiecontainment/maplevels/calculatefun9
+							}
+						}
+						else do
+						{
+							es_xdoblock zombiecontainment/maplevels/calculatefun9
+						}
+					}
+					else do
+					{
+						es_xdoblock zombiecontainment/maplevels/calculatefun9
+					}
+				}
+				else do
+				{
+					es_xdoblock zombiecontainment/maplevels/calculatefun9
+				}
+			}
+			else do
+			{
+				es_xdoblock zombiecontainment/maplevels/calculatefun9
+			}
+		}
+		else do
+		{
+			es_xdoblock zombiecontainment/maplevels/calculatefun9
+		}
+	}
+	else do
+	{
+		es_xdoblock zombiecontainment/maplevels/calculatefun9
+	}
+}
+
+block calculatefun9
+{
+	if (server_var(f9) > server_var(f1)) do
+	{
+		if (server_var(f9) > server_var(f3)) do
+		{
+			if (server_var(f9) > server_var(f4)) do
+			{
+				if (server_var(f9) > server_var(f5)) do
+				{
+					if (server_var(f9) > server_var(f6)) do
+					{
+						if (server_var(f9) > server_var(f7)) do
+						{
+							if (server_var(f9) > server_var(f8)) do
+							{
+								if (server_var(f9) > server_var(f2)) do
+								{
+									if (server_var(f9) > server_var(f10)) do
+									{
+										es_delayed 1 changelevel server_var(funmap9)
+									}
+									else do
+									{
+										es_msg extending this map
+									}
+								}
+								else do
+								{
+									es_msg extending this map
+								}
+							}
+							else do
+							{
+								es_msg extending this map
+							}
+						}
+						else do
+						{
+							es_msg extending this map
+						}
+					}
+					else do
+					{
+						es_msg extending this map
+					}
+				}
+				else do
+				{
+					es_msg extending this map
+				}
+			}
+			else do
+			{
+				es_msg extending this map
+			}
+		}
+		else do
+		{
+			es_msg extending this map
+		}
+	}
+	else do
+	{
+		es_msg extending this map
+	}
+}
+
